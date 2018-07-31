@@ -1,0 +1,149 @@
+<div class="container-fluid" ng-controller="UsersCtrl">
+<div style="margin-left:20px; color:#666;" class="row">
+    <h4>USER MANAGEMENT MODULE</h4> 
+    <b>AngularJS Single Page Application</b>
+    <p>Angular v.1.6.6 latest stable version</p>
+    <b>FEATURES - FUNCTIONALITIES</b>
+    <ul>
+        <li>lists users</li>
+        <li>filters results by search phrase (searching and filtering is performed on keypress in the username field)</li>
+        <li>filter results by role (dropdown select menu)</li>
+        <li>pagination</li>
+        <li>setting the number of results/records shown per page</li>
+        <li>double filtering : filtering by phrase and by role can be combined</li>
+        <li>bootstrap responsive table</li>
+    </ul>
+</div>
+
+<hr> 
+
+<div class="row form-group">
+    <label>Filter by a phrase (username):</label>
+    <input type="text" ng-model="search" class="form-control" placeholder="type a phrase" /> 
+    <button type="button" class="btn btn-warning" ng-click="reset()">CLEAR</button>             
+</div>    
+
+<p></p>
+
+<div class="row form-group">
+  <label>Filter by role:</label>
+  <select class="form-control" ng-model='search2'>
+    <option ng-repeat='role in roles'>{{role}}</option>
+  </select> 
+</div> 
+
+
+<!-- Table containing all data in $scope.users -->
+<div class="row">
+<div class="table-responsive">
+            <table id="" class="table table-striped table-condensed">
+                <thead>
+                    <tr>                   
+                        <th>USERNAME</th>
+                        <th>FIRSTNAME</th> 
+                        <th>LASTNAME</th>
+                        <th>ROLE</th>
+                        <th>ENABLED</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- prints out all data in $scope.users, paginates, sorts by username or lastname, filters by phrase or role -->
+                    <tr ng-repeat="user in users.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))|filter: { username: search, role: search2 }">
+                        <td>{{user.username}}</td>
+                        <td>{{user.firstName}}</td>
+                        <td>{{user.lastName}}</td>
+                        <td>{{user.role}}</td>
+                        <td>{{user.enabled}}</td>
+                        <td><button type="button" class="btn btn-info" ng-click="editUser($index)">EDIT</button></td>
+                        <!-- button will show only when there is no filtering active -->
+                        <td><button ng-if="!search && !search2" type="button" class="btn btn-danger" ng-click="deleteUser($index)">DELETE</button></td>
+                        <!-- button will show only when there is filtering active -->
+                        <td><button ng-if="search || search2" type="button" class="btn btn-danger" ng-click="deleteFilteredUser(user)">DELETE</button></td>
+                        <!-- Edit User Expand Panel -->
+                        <td>
+                            <table id="editUserTable{{$index}}" class="hideClass">
+                                <tr>
+                                    <td>
+                                        <label>Username</label> <input ng-disabled="true" type="text" ng-model="user.username" name="" value="" id="" size="30" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label>First Name</label> <input type="text" ng-model="user.firstName" name="" value="" id="" size="30" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label>Last Name</label> <input type="text" ng-model="user.lastName" name="" value="" id="" size="30" />
+                                    </td>
+                                </tr>    
+                                <tr>
+                                    <td>
+                                        <label>Role</label> <select ng-model="user.role"><option ng-repeat="value1 in ['admin', 'user']">{{value1}}</option></select>
+                                    </td>
+                                </tr>  
+                                <tr>
+                                    <td>
+                                        <label>Enabled</label> <select ng-model="user.enabled"><option ng-repeat="value2 in [0, 1]">{{value2}}</option></select>
+                                    </td>
+                                </tr>                                                                                                                              
+                                <tr>
+                                    <td>                  
+                                        <button type="button" class="btn btn-success" ng-click="editOkay($index)">UPDATE</button>
+                                        <button type="button" class="btn btn-default" ng-click="editCancel($index)">CLOSE</button> 
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>   
+                        <!-- /Edit User Expand Panel -->                   
+                    </tr>
+                </tbody>
+            </table> 
+
+            <button type="button" class="btn btn-primary" ng-click="expandNewUser()">ADD NEW USER</button><br><br>
+            <!-- NEW USER FORM -->
+            <div ng-show="showNewUser" id="newUser" class="">
+            <pre>new user is always added in the end of the current list (check last page). you must enter a username but you can enter/edit the rest of the fields later.</pre>
+                <label>Username</label>
+                <input type="text" ng-model="newUser.username" name="" value="" id="" class="" size="30" /> 
+
+                <label>Firstname</label>
+                <input type="text" ng-model="newUser.firstName" name="" value="" id="" class="" maxlength="30" /> 
+
+                <label>Lastname</label>
+                <input type="text" ng-model="newUser.lastName" name="" value="" id="" class="" maxlength="30" />     
+
+                <label>Role</label> 
+                <select ng-model="newUser.role"><option ng-repeat="value1 in ['admin', 'user']">{{value1}}</option></select>
+
+                <label>Enabled</label> 
+                <select ng-model="newUser.enabled"><option ng-repeat="value2 in [0, 1]">{{value2}}</option></select>
+
+                <br><br>
+                <button type="button" class="btn btn-success" ng-click="AddUser()">ADD</button>
+                <button type="button" class="btn btn-default" ng-click="CancelAddUser()">CANCEL</button>
+                <br><br>
+            </div>            
+
+            <!-- pagination components -->
+            View <select ng-model="viewby" ng-change="setItemsPerPage(viewby)"><option>3</option><option>5</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option></select> records at a time.
+
+            <hr />
+
+            <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+            <pager total-items="totalItems" ng-model="currentPage" items-per-page="itemsPerPage"></pager>
+
+            <hr />
+
+            <pre>The selected page no: {{currentPage}}</pre>
+
+            <pre>Page: {{currentPage}} / {{numPages}}</pre>            
+            <!-- /pagination components -->
+
+</div>
+</div>  
+

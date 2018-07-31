@@ -1,0 +1,22 @@
+html, input, select, button { font-family: 'Catamaran', sans-serif; }
+	
+input, select { color:#666; }
+	
+select { text-align:center; }
+
+button { font-size:10px; }
+
+/* overwrite bootstrap css */
+.form-control { display: inline-block!important; width: 160px!important; }
+
+.table-striped > tbody > tr:nth-of-type(2n+1) { background-color: #e8f8f9 !important; }
+
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th
+{ border-top: none!important; }
+
+.hideClass { display:none;}
+
+
+
+
+	
